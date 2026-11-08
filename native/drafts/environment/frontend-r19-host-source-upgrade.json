@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "patch": "frontend-r19-host-source-upgrade.patch",
+  "patch_sha256": "3bf81e4b3c204a922a2e46912fe75c2f97af16413c1993f0b5f3c92d14617404",
+  "sources": [
+    {
+      "source": "scripts/native_build.py",
+      "before_sha256": "b3a275ec0b56e29e08a619b0eae6821017fdcb5ec4d79241b0327e0fd59eb569",
+      "after_sha256": "1d9395b4b40a817188cde9751a80c60d7acc7de214e33deee2d1cde7291233d5"
+    },
+    {
+      "source": "scripts/verify_native_checkpoint_units.py",
+      "before_sha256": "91f9a9ac06fb1fbcf98443926636070fbe2e05f97de9238dab8c7c4428bd8438",
+      "after_sha256": "b76c21707abd4d9ccc18aeec4267a0ebd6c237a05e8aa2487ed475a6b47e6d55"
+    }
+  ],
+  "scope": "Recover exact pre-R19 build and checkpoint runners; historical receipts unchanged",
+  "native_runtime_verified": false,
+  "production_admitted": false
+}

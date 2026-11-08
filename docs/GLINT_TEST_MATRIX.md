@@ -12,7 +12,7 @@
 
 See the [R19 receipt](../native/drafts/upstream-156-frontend-r19/frontend-validation.json)
 and [source recipe](../native/drafts/upstream-156-frontend-r19/README.md).
-The candidate remains unregistered and unselected. Native discovery/execution,
+The candidate is registered for explicit build/test, but remains unselected. Native discovery/execution,
 crash/reopen, compatibility and package/update/rollback checks are still required.
 
 

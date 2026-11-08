@@ -178,7 +178,8 @@ def test_invalid_resource_limits_fail_before_workspace_access(monkeypatch, jobs,
 
 
 @pytest.mark.parametrize('fault', [None, 'case', 'listing', 'input', 'binary', 'receipt', 'build'])
-@pytest.mark.parametrize('candidate_name', ('upstream-156-checkpoint-r12', 'upstream-156-recovery-r16'))
+@pytest.mark.parametrize('candidate_name', ('upstream-156-checkpoint-r12', 'upstream-156-recovery-r16',
+                                         'upstream-156-frontend-r19'))
 def test_native_batch_pipeline_retains_failures_and_checks_postguards(monkeypatch, tmp_path, fault, candidate_name):
     candidate = build.load_candidate(candidate_name)
     plan = units.load_plan(candidate)
@@ -249,12 +250,40 @@ def test_native_batch_pipeline_retains_failures_and_checks_postguards(monkeypatc
             (output / (binary + '.exe')).write_bytes(b'changed after execution')
         destination = Path(next(arg.split('json:', 1)[1] for arg in command if arg.startswith('--gtest_output=')))
         destination.write_text(json.dumps(observed), encoding='utf-8')
+        for arg in command:
+            if arg.startswith('--user-data-dir='):
+                profile = Path(arg.split('=', 1)[1])
+                (profile / 'owned-test-state').write_bytes(b'host protocol fixture')
 
     monkeypatch.setattr(units, 'run_tests', execute)
+    dispatch = None
+    if candidate_name == 'upstream-156-frontend-r19':
+        from scripts import native_checkpoint_browser as pairs
+        from scripts import native_checkpoint_dispatch as browser_dispatch
+
+        monkeypatch.setattr(pairs, 'run_tests', execute)
+        monkeypatch.setattr(browser_dispatch.crash, 'validate_source_contract', Mock(return_value={}))
+
+        def route_browser(executable, required, **kwargs):
+            assert executable.name == 'browser_tests.exe'
+            assert sum(map(len, required.values())) == 21
+            assert kwargs['plan_path'] == candidate['directory'] / 'native-case-plan.json'
+            assert kwargs['expected_binary_sha256'] == units.checksum(executable)
+            return dict(passed=fault != 'dispatch',
+                        completed_gtest_cases=21 if fault == 'dispatch-count' else 20,
+                        qualified_forced_termination_cases=0 if fault == 'forced' else 1)
+
+        dispatch = Mock(side_effect=route_browser)
+        monkeypatch.setattr(browser_dispatch, 'run_browser_dispatch', dispatch)
     report = units._verify_locked(tmp_path / 'workspace', report_dir, candidate, plan, 4, 900)
     assert report['passed'] is (fault is None)
     assert report['postguards_passed'] is (fault not in ('input', 'binary', 'receipt'))
     assert not report['browser_runtime_verified'] and not report['production_admitted']
+    if candidate_name == 'upstream-156-frontend-r19' and fault is None:
+        dispatch.assert_called_once()
+        browser_row = next(row for row in report['targets'] if row['binary'] == 'browser_tests')
+        assert browser_row['executed_cases'] == 20
+        assert browser_row['qualified_forced_termination_cases'] == 1
     assert json.loads((report_dir / 'report.json').read_bytes()) == report
     if fault in ('receipt', 'build'):
         assert report['targets'] == []
@@ -266,6 +295,12 @@ def test_native_batch_pipeline_retains_failures_and_checks_postguards(monkeypatc
     if fault is None:
         assert sum(r['prepared_bodies'] for r in report['targets']) == len(plan['cases'])
         assert sum(r['executed_cases'] for r in report['targets']) > len(plan['cases'])
+
+
+@pytest.mark.parametrize('fault', ('dispatch', 'dispatch-count', 'forced'))
+def test_r19_native_pipeline_rejects_incomplete_browser_dispatch(monkeypatch, tmp_path, fault):
+    test_native_batch_pipeline_retains_failures_and_checks_postguards(
+        monkeypatch, tmp_path, fault, 'upstream-156-frontend-r19')
 
 
 @pytest.mark.parametrize('failed', (None, 'A'))

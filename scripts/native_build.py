@@ -24,6 +24,7 @@ WEBGPU_CANDIDATES = (
     "upstream-156-document-r15",
     "upstream-156-recovery-r16",
     "upstream-156-worker-r17",
+    "upstream-156-frontend-r19",
 )
 CANDIDATES = ("upstream-156", *WEBGPU_CANDIDATES)
 WINDOWS_DIA_FILES = ("include/dia2.h", "include/cvconst.h", "include/diacreate.h", "lib/diaguids.lib",

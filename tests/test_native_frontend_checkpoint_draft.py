@@ -24,15 +24,19 @@ def read(path):
 
 
 @pytest.fixture
-def candidate(monkeypatch):
-    assert NAME not in build.CANDIDATES
-    monkeypatch.setattr(build, 'CANDIDATES', (*build.CANDIDATES, NAME))
+def candidate():
+    assert NAME in build.CANDIDATES
     return build.load_candidate(NAME)
 
 
-def test_frontend_draft_is_not_registered_for_native_execution():
-    assert NAME not in build.CANDIDATES
-    assert NAME not in units.PLAN_SPECS
+def test_frontend_candidate_has_explicit_complete_native_dispatch():
+    assert NAME in build.CANDIDATES
+    assert units.PLAN_SPECS[NAME] == (136, 337)
+    assert NAME in units.BROWSER_PLAN_CANDIDATES
+    assert NAME in units.SOURCE_BOUND_BROWSER_CANDIDATES
+    plan = units.load_plan(build.load_candidate(NAME))
+    assert len(plan['binaries']) == 7
+    assert sum(row['binary'] == 'browser_tests' for row in plan['cases']) == 21
 
 
 def test_frontend_recipe_preserves_the_complete_registered_base(candidate):

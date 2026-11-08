@@ -409,3 +409,4 @@ native/drafts/environment/desktop-build-paths-host-source-upgrade.json text eol=
 native/drafts/environment/checkpoint-owned-job-host-source-upgrade.json text eol=lf
 native/drafts/upstream-156-http-r18/** text eol=lf
 native/drafts/upstream-156-frontend-r19/** text eol=lf
+native/drafts/environment/frontend-r19-host-source-upgrade.json text eol=lf
