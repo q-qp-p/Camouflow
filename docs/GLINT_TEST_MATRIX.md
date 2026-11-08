@@ -1,5 +1,21 @@
 # Glint browser test matrix
 
+## 2026-11-08: R19 frontend checks passed; native/runtime gates remain open
+
+| Gate | Result | Boundary |
+| --- | --- | --- |
+| Initial complete frontend diagnostic | 42/47 passed, five failures, no timeouts | Found source errors and isolated binding-generation prerequisites |
+| Corrected complete frontend diagnostic | **47/47 passed**, final input guards passed, original invalid-callback negative control reproduced | Typechecking only; no linking or gtest execution |
+| Native checkpoint source plan | All **337 declarations** retained in seven binaries; all 30 case-source files checked | Declarations are not executed test results |
+| Source replay | **181 patches** apply and reverse; 511 final files match, 353 upstream originals restored | Isolated source tree; canonical R16 selection unchanged |
+| Browser runtime / external detectors / CAPTCHA | No new results | No transfer of historical results or PASS claims |
+
+See the [R19 receipt](../native/drafts/upstream-156-frontend-r19/frontend-validation.json)
+and [source recipe](../native/drafts/upstream-156-frontend-r19/README.md).
+The candidate remains unregistered and unselected. Native discovery/execution,
+crash/reopen, compatibility and package/update/rollback checks are still required.
+
+
 ## 2026-11-04: host CI прошёл; сборка нативных тестов R16 завершилась ошибкой
 
 | Gate | Результат | Граница |

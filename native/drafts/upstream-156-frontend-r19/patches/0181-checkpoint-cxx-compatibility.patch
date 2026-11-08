@@ -1,0 +1,181 @@
+diff --git a/chrome/browser/net/glint_cookie_prefix_browsertest.cc b/chrome/browser/net/glint_cookie_prefix_browsertest.cc
+index 3ebf8649baf74532c4c4b328df0db317f56d05ef..2d7eb7bc136fcba6b6570b972be5baa3c13c293b 100644
+--- a/chrome/browser/net/glint_cookie_prefix_browsertest.cc
++++ b/chrome/browser/net/glint_cookie_prefix_browsertest.cc
+@@ -213,7 +213,7 @@ class GlintCookiePrefixBrowserTest : public InProcessBrowserTest {
+   }
+ 
+   content::ServiceWorkerContext* WorkerContext() {
+-    return browser()->profile()->GetDefaultStoragePartition()->GetServiceWorkerContext();
++    return browser()->GetProfile()->GetDefaultStoragePartition()->GetServiceWorkerContext();
+   }
+ 
+   content::WebContents* Contents() {
+@@ -222,7 +222,7 @@ class GlintCookiePrefixBrowserTest : public InProcessBrowserTest {
+   content::GlintCookiePrefixCommitTestResult CommitCookies() {
+     base::test::TestFuture<content::GlintCookiePrefixCommitTestResult> done;
+     auto operation = content::BeginGlintCookiePrefixCommitForTesting(
+-        browser()->profile(), base::TimeTicks::Now() + base::Seconds(15),
++        browser()->GetProfile(), base::TimeTicks::Now() + base::Seconds(15),
+         done.GetCallback());
+     return done.Get();
+   }
+@@ -362,7 +362,7 @@ IN_PROC_BROWSER_TEST_F(GlintCookiePrefixBrowserTest, CancelPendingActiveWorkerPr
+   ASSERT_EQ(true, content::EvalJs(Contents(), kWriteWorkerCookie));
+   base::test::TestFuture<content::GlintCookiePrefixCommitTestResult> done;
+   auto operation = content::BeginGlintCookiePrefixCommitForTesting(
+-      browser()->profile(), base::TimeTicks::Now() + base::Seconds(15),
++      browser()->GetProfile(), base::TimeTicks::Now() + base::Seconds(15),
+       done.GetCallback());
+   operation.RunAndReset();
+   EXPECT_FALSE(done.IsReady());
+@@ -376,7 +376,7 @@ IN_PROC_BROWSER_TEST_F(GlintCookiePrefixBrowserTest, WorkerStopRejectsPendingPre
+   ASSERT_EQ(true, content::EvalJs(Contents(), kWriteWorkerCookie));
+   base::test::TestFuture<content::GlintCookiePrefixCommitTestResult> done;
+   auto operation = content::BeginGlintCookiePrefixCommitForTesting(
+-      browser()->profile(), base::TimeTicks::Now() + base::Seconds(15),
++      browser()->GetProfile(), base::TimeTicks::Now() + base::Seconds(15),
+       done.GetCallback());
+   base::test::TestFuture<void> stopped;
+   WorkerContext()->StopAllServiceWorkers(stopped.GetCallback());
+@@ -405,7 +405,7 @@ IN_PROC_BROWSER_TEST_F(GlintCookiePrefixBrowserTest, ExpiredDeadlineCannotCertif
+   ASSERT_EQ(true, content::EvalJs(Contents(), kWriteWorkerCookie));
+   base::test::TestFuture<content::GlintCookiePrefixCommitTestResult> done;
+   auto operation = content::BeginGlintCookiePrefixCommitForTesting(
+-      browser()->profile(), base::TimeTicks::Now() - base::Seconds(1),
++      browser()->GetProfile(), base::TimeTicks::Now() - base::Seconds(1),
+       done.GetCallback());
+   EXPECT_FALSE(done.IsReady());
+   const auto result = done.Get();
+@@ -418,7 +418,7 @@ IN_PROC_BROWSER_TEST_F(GlintCookiePrefixBrowserTest, OversizedDeadlineCannotCert
+   ASSERT_EQ(true, content::EvalJs(Contents(), kWriteWorkerCookie));
+   base::test::TestFuture<content::GlintCookiePrefixCommitTestResult> done;
+   auto operation = content::BeginGlintCookiePrefixCommitForTesting(
+-      browser()->profile(), base::TimeTicks::Now() + base::Seconds(31),
++      browser()->GetProfile(), base::TimeTicks::Now() + base::Seconds(31),
+       done.GetCallback());
+   EXPECT_FALSE(done.IsReady());
+   const auto result = done.Get();
+diff --git a/third_party/blink/renderer/core/dom/document.cc b/third_party/blink/renderer/core/dom/document.cc
+index 0b9ae43d367efae5184facd508f9ff9318205399..20f8964cfb58fc2cf48631eff66966d7222e6912 100644
+--- a/third_party/blink/renderer/core/dom/document.cc
++++ b/third_party/blink/renderer/core/dom/document.cc
+@@ -6967,9 +6967,9 @@ void Document::DrainCookieWritesForCheckpoint(
+   struct Reply {
+     explicit Reply(base::OnceCallback<void(bool)> completion)
+         : callback(std::move(completion)) {}
+-    void Complete(bool success) {
++    void Complete(bool operation_succeeded) {
+       if (callback) {
+-        std::move(callback).Run(success);
++        std::move(callback).Run(operation_succeeded);
+       }
+     }
+     base::OnceCallback<void(bool)> callback;
+@@ -7008,20 +7008,31 @@ void Document::DrainCookieWritesForCheckpoint(
+         return current && current->IsRegisteredForCheckpoint() &&
+                current->CaptureWritesForCheckpoint() == snapshot;
+       };
+-  auto complete = [reply, runner, validate](bool success) {
+-    if (!reply->callback || !reply->remaining) {
++  using CheckpointValidation = decltype(validate);
++  auto complete = [](std::shared_ptr<Reply> pending,
++                     scoped_refptr<base::SequencedTaskRunner> task_runner,
++                     CheckpointValidation validation, bool operation_succeeded) {
++    if (!pending->callback || !pending->remaining) {
+       return;
+     }
+-    reply->success = reply->success && success;
+-    if (--reply->remaining != 0) {
++    pending->success = pending->success && operation_succeeded;
++    if (--pending->remaining != 0) {
+       return;
+     }
+-    runner->PostTask(FROM_HERE, base::BindOnce(
+-        [reply, validate]() { reply->Complete(reply->success && validate()); }));
++    task_runner->PostTask(
++        FROM_HERE,
++        base::BindOnce(
++            [](std::shared_ptr<Reply> final_reply,
++               CheckpointValidation final_validation) {
++              final_reply->Complete(final_reply->success && final_validation());
++            },
++            pending, validation));
+   };
+-  cookie_jar_->DrainWritesForCheckpoint(deadline, base::BindOnce(complete));
++  cookie_jar_->DrainWritesForCheckpoint(
++      deadline, base::BindOnce(complete, reply, runner, validate));
+   if (participant) {
+-    participant->DrainWritesForCheckpoint(deadline, base::BindOnce(complete));
++    participant->DrainWritesForCheckpoint(
++        deadline, base::BindOnce(complete, reply, runner, validate));
+   }
+ }
+ 
+diff --git a/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc b/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc
+index e6fd827011d4918a1cdd620656ca950e8375cce3..067c982103c747618f715e1edf551b9c02ddb780 100644
+--- a/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc
++++ b/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc
+@@ -371,7 +371,7 @@ bool ServiceWorkerGlobalScope::IsCookieCheckpointCaptureCurrent(
+     uint64_t ticket) const {
+   if (!ticket || ticket != cookie_checkpoint_ticket_ ||
+       !cookie_checkpoint_capture_valid_ || cookie_checkpoint_disposed_ ||
+-      IsClosing() || IsContextDestroyed() || !receiver_.is_bound()) {
++      IsClosing() || ExecutionContext::IsContextDestroyed() || !receiver_.is_bound()) {
+     return false;
+   }
+   auto* current = CookieCheckpointParticipant::GetIfExists(*this);
+@@ -397,7 +397,7 @@ void ServiceWorkerGlobalScope::CaptureCookieProducerForCheckpoint(
+     return;
+   }
+   ++cookie_checkpoint_ticket_;
+-  if (cookie_checkpoint_disposed_ || IsClosing() || IsContextDestroyed() ||
++  if (cookie_checkpoint_disposed_ || IsClosing() || ExecutionContext::IsContextDestroyed() ||
+       !receiver_.is_bound()) {
+     std::move(callback).Run(false, 0);
+     return;
+@@ -447,18 +447,32 @@ void ServiceWorkerGlobalScope::DrainCookieWritesForCheckpoint(
+                      reply),
+       deadline - now);
+   auto delivered = base::BindOnce(
+-      [reply, runner, owner = WeakPersistent<ServiceWorkerGlobalScope>(this),
+-       ticket, deadline](bool success) {
+-        runner->PostTask(FROM_HERE, base::BindOnce(
+-            [reply, owner, ticket, deadline, success]() {
+-              const bool valid = owner && base::TimeTicks::Now() < deadline &&
+-                                 owner->IsCookieCheckpointCaptureCurrent(ticket);
+-              if (owner && owner->cookie_checkpoint_ticket_ == ticket) {
+-                owner->cookie_checkpoint_capture_valid_ = false;
+-              }
+-              reply->Complete(success && valid);
+-            }));
+-      });
++      [](std::shared_ptr<Reply> pending,
++         scoped_refptr<base::SequencedTaskRunner> task_runner,
++         WeakPersistent<ServiceWorkerGlobalScope> owner,
++         uint64_t captured_ticket, base::TimeTicks captured_deadline,
++         bool operation_succeeded) {
++        task_runner->PostTask(
++            FROM_HERE,
++            base::BindOnce(
++                [](std::shared_ptr<Reply> final_reply,
++                   WeakPersistent<ServiceWorkerGlobalScope> final_owner,
++                   uint64_t final_ticket, base::TimeTicks final_deadline,
++                   bool succeeded) {
++                  const bool valid =
++                      final_owner && base::TimeTicks::Now() < final_deadline &&
++                      final_owner->IsCookieCheckpointCaptureCurrent(final_ticket);
++                  if (final_owner &&
++                      final_owner->cookie_checkpoint_ticket_ == final_ticket) {
++                    final_owner->cookie_checkpoint_capture_valid_ = false;
++                  }
++                  final_reply->Complete(succeeded && valid);
++                },
++                pending, owner, captured_ticket, captured_deadline,
++                operation_succeeded));
++      },
++      reply, runner, WeakPersistent<ServiceWorkerGlobalScope>(this), ticket,
++      deadline);
+   if (auto* participant = cookie_checkpoint_producer_.Get()) {
+     participant->DrainWritesForCheckpoint(deadline, std::move(delivered));
+   } else {

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "passed": true,
+  "scope": "Three-file C++ compatibility correction",
+  "original_patch_sha256": "f6edb97d58fbf4f8bc829f95d53445234ed7dc073d9415f9ca3a32f6cc3c18f8",
+  "normalized_patch_sha256": "4660a0b37bf353ddd0c00488cb5ff590bd40b24eef229d74b903f1e9ca2d6916",
+  "patch": "0181-checkpoint-cxx-compatibility.patch",
+  "before_source_sha256": {
+    "third_party/blink/renderer/core/dom/document.cc": "a47b27fa638a7972500e497417da039ba18e32d892e06f19b07b2a310ffc110d",
+    "third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc": "e351c1bb0e04d6abe650bc673585cf89b38edadd3d0325a61efb8ef940bdf7f7",
+    "chrome/browser/net/glint_cookie_prefix_browsertest.cc": "b0a7748320dc6482ad6783c21bfe5138ef348e2e0b992e0530b617f04bc386aa"
+  },
+  "final_source_sha256": {
+    "chrome/browser/net/glint_cookie_prefix_browsertest.cc": "9b8dc5865dd72713e41335e4ff9e35826a6c5a8b5cf8226def9f0caec8077c1d",
+    "third_party/blink/renderer/core/dom/document.cc": "052794db8de3862414697edc780f4619e3fe2b5e2936bf3f8df8a545a39e99ca",
+    "third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc": "8d3a37069b51799886188a2429fa546f74b08e36c0bfad265fff3713baf5c8e3"
+  },
+  "frontend_units_passed": 47,
+  "compiled": false,
+  "native_executed": false,
+  "runtime_verified": false,
+  "production_admitted": false
+}

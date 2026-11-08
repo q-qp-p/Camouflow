@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "passed": true,
+  "scope": "47 C++ frontend translation units; no linking, gtest execution or runtime admission",
+  "execution_report_sha256": "6000a07e3f393e03ae3feaa4dc68dfbaed9f44b8b486491fc077c132e5155976",
+  "translation_units": 47,
+  "checkpoint_case_source_units": 30,
+  "native_declarations_prepared": 337,
+  "source_patches": 181,
+  "canonical_source_modified": false,
+  "original_negative_control_reproduced": true,
+  "input_postguards_passed": true,
+  "style_checks_disabled": false,
+  "source_correction_sha256": "f6edb97d58fbf4f8bc829f95d53445234ed7dc073d9415f9ca3a32f6cc3c18f8",
+  "normalized_patch_sha256": "4660a0b37bf353ddd0c00488cb5ff590bd40b24eef229d74b903f1e9ca2d6916",
+  "corrected_source_sha256": {
+    "chrome/browser/net/glint_cookie_prefix_browsertest.cc": "9b8dc5865dd72713e41335e4ff9e35826a6c5a8b5cf8226def9f0caec8077c1d",
+    "third_party/blink/renderer/core/dom/document.cc": "052794db8de3862414697edc780f4619e3fe2b5e2936bf3f8df8a545a39e99ca",
+    "third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc": "8d3a37069b51799886188a2429fa546f74b08e36c0bfad265fff3713baf5c8e3"
+  },
+  "commands": [
+    {
+      "source": "third_party/blink/renderer/core/loader/cookie_jar.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/dom/document.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/cookie_store/cookie_store.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/loader/cookie_checkpoint_participant.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/loader/cookie_checkpoint_state_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/loader/cookie_checkpoint_participant_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/loader/document_cookie_cohort_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/core/dom/document_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/cookie_store/cookie_store_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/service_worker/service_worker_global_scope.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/service_worker/service_worker_global_scope_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/service_worker/fake_service_worker.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/public/mojom/service_worker/service_worker.mojom.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/public/mojom/service_worker/service_worker.mojom-blink.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/public/mojom/service_worker/service_worker.mojom-shared.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/service_worker/service_worker_version.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/service_worker/service_worker_version_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/camouflow_native/glint/partition_worker_cookie_fence.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/camouflow_native/glint/partition_worker_cookie_fence_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/camouflow_native/glint/profile_document_commit.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/camouflow_native/glint/profile_document_commit_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/public/test/glint_cookie_checkpoint_test_utils.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "chrome/browser/net/glint_cookie_prefix_browsertest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/cookies/cookie_store.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/url_request/url_request_http_job.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "services/network/cookie_manager.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/cookies/http_cookie_checkpoint_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/url_request/glint_http_cookie_checkpoint_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/url_request/glint_http_cookie_sql_checkpoint_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "chrome/browser/net/profile_network_context_service_browsertest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "components/services/storage/dom_storage/async_dom_storage_database_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "components/services/storage/dom_storage/local_storage_impl_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "components/services/storage/dom_storage/storage_area_impl_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/camouflow_native/glint/profile_producer_fence_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/dom_storage/dom_storage_context_wrapper_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/renderer_host/render_process_host_browsertest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/renderer_host/render_process_host_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/browser/storage_partition_impl_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "content/renderer/render_thread_impl_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/cookies/cookie_monster_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "net/extras/sqlite/sqlite_persistent_cookie_store_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "services/network/cookie_manager_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "services/network/restricted_cookie_manager_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "services/network/session_cleanup_cookie_store_unittest.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/storage/cached_storage_area_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/modules/storage/storage_controller_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "source": "third_party/blink/renderer/platform/mojo/heap_mojo_remote_test.cc",
+      "returncode": 0,
+      "timed_out": false
+    }
+  ],
+  "shared_bindings_generated_without_variant_typemap": true,
+  "upstream_blink_test_bindings_generated": true,
+  "linked": false,
+  "native_executed": false,
+  "runtime_verified": false,
+  "production_admitted": false
+}
